@@ -41,14 +41,18 @@
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define THREAD_SAMPLING_CAPTURE_PRIO                          	10
-#define THREAD_SAMPLING_CAPTURE_PREEMPTION_THRESHOLD          	10
+#define THREAD_SIGNAL_GENERATOR_PRIO                       			10
+#define THREAD_SIGNAL_GENERATOR_PRIO_PREEMPTION_THRESHOLD      	10
 
-#define THREAD_SIGNAL_PROCESSING_PRIO                          	10
-#define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	10
+#define THREAD_SAMPLING_CAPTURE_PRIO                          	9
+#define THREAD_SAMPLING_CAPTURE_PREEMPTION_THRESHOLD          	9
 
-#define THREAD_SAMPLING_CAPTURE_EVT                           	0x01
-#define THREAD_SIGNAL_PROCESSING_EVT                           	0x02
+#define THREAD_SIGNAL_PROCESSING_PRIO                          	9//8
+#define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	9//8
+
+#define THREAD_SIGNAL_GENERATOR_EVT                           	0x01
+#define THREAD_SAMPLING_CAPTURE_EVT                           	0x02
+#define THREAD_SIGNAL_PROCESSING_EVT                           	0x03
 /* USER CODE END EC */
 
 /* Private defines -----------------------------------------------------------*/

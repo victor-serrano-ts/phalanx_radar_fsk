@@ -25,6 +25,10 @@ SUBDIRS := \
 AZURE_RTOS/App \
 Core/Src \
 Core/Startup \
+Drivers/CMSIS/DSP/Source/CommonTables \
+Drivers/CMSIS/DSP/Source/ComplexMathFunctions \
+Drivers/CMSIS/DSP/Source/StatisticsFunctions \
+Drivers/CMSIS/DSP/Source/TransformFunctions \
 Drivers/STM32U5xx_HAL_Driver/Src \
 Middlewares/ST/threadx/common/src \
 Middlewares/ST/threadx/ports/cortex_m33/gnu/src \

@@ -34,6 +34,9 @@
 HAL_StatusTypeDef MX_ADCQueue_Config(void);
 HAL_StatusTypeDef MX_DACQueue_Config(void);
 
+extern DMA_QListTypeDef ADCQueue;
+extern DMA_QListTypeDef DACQueue;
+
 #ifdef __cplusplus
 }
 #endif

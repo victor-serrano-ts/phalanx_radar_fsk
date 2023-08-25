@@ -8,7 +8,7 @@
 #include "fsk_generator.h"
 #include <stdint.h>
 
-DAC_HandleTypeDef hdac1;
+//DMA_QListTypeDef DACQueue;
 
 uint32_t data_sin[32]  = {
 		4020, 4020, 4020, 4020, 4020, 4020, 4020, 4020,
@@ -16,7 +16,6 @@ uint32_t data_sin[32]  = {
 		0,    0,    0,    0,    0,    0,    0,    0,
 		0,    0,    0,    0,    0,    0,    0,    0,
 };
-
 /*uint32_t data_sin[128]  = {
   2048, 2145, 2242, 2339, 2435, 2530, 2624, 2717, 2808, 2897,
   2984, 3069, 3151, 3230, 3307, 3381, 3451, 3518, 3581, 3640,
@@ -34,8 +33,14 @@ uint32_t data_sin[32]  = {
 };*/
 
 
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma)
+{
+  /* Add code to be performed after DMA half complete */
+	asm("NOP");
+}
+
 /**
-  * @brief  Function implementing FSK signal transmission.
+  * @brief  Function implementing start FSK signal transmission.
   * @param  None
   * @retval None
   */
@@ -47,3 +52,18 @@ void startFskTransmission(void)
 		Error_Handler();
 	}
 }
+
+/**
+  * @brief  Function implementing stop FSK signal transmission.
+  * @param  None
+  * @retval None
+  */
+void stopFskTransmission(void)
+{
+	if (HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1) != HAL_OK)
+	{
+		/* Stop DMA Error */
+		Error_Handler();
+	}
+}
+

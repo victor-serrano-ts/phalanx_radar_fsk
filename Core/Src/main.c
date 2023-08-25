@@ -22,9 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
 
-#include "fsk_generator.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +44,7 @@
 ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc4;
 
-//DAC_HandleTypeDef hdac1;
+DAC_HandleTypeDef hdac1;
 
 DMA_HandleTypeDef handle_GPDMA1_Channel10;
 DMA_HandleTypeDef handle_GPDMA1_Channel8;
@@ -59,7 +57,6 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -133,6 +130,8 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  //pasar a fuincion dentro de procesado de señal
 
   /* USER CODE END 2 */
 
@@ -262,7 +261,7 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-
+  __HAL_LINKDMA(&hadc4, DMA_Handle, handle_GPDMA1_Channel10);
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -347,7 +346,10 @@ static void MX_ADC4_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC4_Init 2 */
-
+  if (HAL_ADCEx_Calibration_Start(&hadc4, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE END ADC4_Init 2 */
 
 }
@@ -403,12 +405,6 @@ static void MX_DAC1_Init(void)
   }
   /* USER CODE BEGIN DAC1_Init 2 */
   __HAL_LINKDMA(&hdac1, DMA_Handle1, handle_GPDMA1_Channel8);
-
-//  if (HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, &data_sin[0], sizeof(data_sin)/sizeof(data_sin[0]), DAC_ALIGN_12B_R) != HAL_OK)
-//  {
-//    /* Start DMA Error */
-//    Error_Handler();
-//  }
   /* USER CODE END DAC1_Init 2 */
 
 }
@@ -466,7 +462,18 @@ static void MX_GPDMA1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN GPDMA1_Init 2 */
+  MX_DACQueue_Config();
+  /* Link DAC queue to DMA channel */
+  if( HAL_DMAEx_List_LinkQ(&handle_GPDMA1_Channel8, &DACQueue)!= HAL_OK)
+  {
+    Error_Handler();
+  }
 
+  MX_ADCQueue_Config();
+  if (HAL_DMAEx_List_LinkQ(&handle_GPDMA1_Channel10, &ADCQueue) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE END GPDMA1_Init 2 */
 
 }
@@ -557,7 +564,6 @@ static void MX_RTC_Init(void)
   RTC_PrivilegeStateTypeDef privilegeState = {0};
   RTC_TimeTypeDef sTime = {0};
   RTC_DateTypeDef sDate = {0};
-  RTC_AlarmTypeDef sAlarm = {0};
 
   /* USER CODE BEGIN RTC_Init 1 */
 
@@ -612,22 +618,6 @@ static void MX_RTC_Init(void)
   {
     Error_Handler();
   }
-
-  /** Enable the Alarm A
-  */
-  sAlarm.AlarmTime.Hours = 0x0;
-  sAlarm.AlarmTime.Minutes = 0x0;
-  sAlarm.AlarmTime.Seconds = 0x1;
-  sAlarm.AlarmTime.SubSeconds = 0x0;
-  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
-  sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
-  sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
-  sAlarm.AlarmDateWeekDay = 0x1;
-  sAlarm.Alarm = RTC_ALARM_A;
-  if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
@@ -657,7 +647,7 @@ static void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 0;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 65535;
+  htim1.Init.Period = 1600;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -711,7 +701,10 @@ static void MX_TIM1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM1_Init 2 */
-
+  if(HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1 != HAL_OK))
+  {
+	  Error_Handler();
+  }
   /* USER CODE END TIM1_Init 2 */
 
 }
@@ -757,7 +750,10 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-
+  if (HAL_TIM_Base_Start(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE END TIM2_Init 2 */
 
 }
@@ -848,51 +844,12 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
 		sAlarm.AlarmTime.Seconds = sAlarm.AlarmTime.Seconds+1;
 	}
 	while(HAL_RTC_SetAlarm_IT(hrtc, &sAlarm, FORMAT_BIN)!=HAL_OK){}
-//	adc_total_time_seconds++;
-//	adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
-//	adc_channel_rate_ksps = adc_total_rate_ksps / 5;
-//	ffts_per_second = total_ffts / adc_total_time_seconds;
-//	printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX Freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
-	if (tx_event_flags_set(&EventFlag, THREAD_SAMPLING_CAPTURE_EVT, TX_OR) != TX_SUCCESS)
-	{
-		Error_Handler();
-	}
-}
-
-/**
-  * @brief  Conversion complete callback in non-blocking mode
-  * @param  hadc: ADC handle
-  * @retval None
-  */
-void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
-{
-  /* Add code to be performed after DMA half complete */
-//  adc_half_count++;
-//  first_half_data_ready = true;
-//  first_half_fft_done = false;
-//  second_half_data_ready = false;
-//  second_half_fft_done = false;
-}
-
-/**
-  * @brief  Conversion DMA half-transfer callback in non-blocking mode
-  * @param  hadc: ADC handle
-  * @retval None
-  */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-  /* Add code to be performed after DMA full complete */
-//	adc_full_count++;
-//	first_half_data_ready = false;
-//	first_half_fft_done = false;
-//	second_half_data_ready = true;
-//	second_half_fft_done = false;
-}
-
-void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma)
-{
-  /* Add code to be performed after DMA half complete */
-	asm("NOP");
+/*	adc_total_time_seconds++;
+	adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
+	adc_channel_rate_ksps = adc_total_rate_ksps / 5;
+	ffts_per_second = total_ffts / adc_total_time_seconds;
+	printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX Freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
+*/
 }
 /* USER CODE END 4 */
 
