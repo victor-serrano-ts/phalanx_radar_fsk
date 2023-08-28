@@ -54,7 +54,7 @@
 
 #define THREAD_SIGNAL_GENERATOR_EVT                           	0x01
 #define THREAD_SAMPLING_CAPTURE_EVT                           	0x02
-#define THREAD_SIGNAL_PROCESSING_EVT                           	0x03
+#define THREAD_SIGNAL_PROCESSING_EVT                           	0x04
 /*
 #ifndef TX_APP_THREAD_TIME_SLICE
 #define TX_APP_THREAD_TIME_SLICE                TX_NO_TIME_SLICE
