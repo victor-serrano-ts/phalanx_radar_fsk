@@ -174,7 +174,7 @@ void MainThread_entry(ULONG thread_input)
 	/* Infinite loop */
 	while(1)
 	{
-		tx_thread_sleep(100);
+		tx_thread_sleep(1000);
 		adc_total_time_seconds++;
 		adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
@@ -186,8 +186,8 @@ void MainThread_entry(ULONG thread_input)
 		counter_sampling = 0;
 		counter_processing = 0;
 
-		//adc_half_count = 0;
-		//adc_full_count = 0;
+adc_half_count = 0;
+adc_full_count = 0;
 	}
   /* USER CODE END MainThread_entry */
 }
@@ -313,6 +313,8 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 				second_half_fft_done = true;
 			}
 */
+
+//	  	tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
 	  }
   }
 }
