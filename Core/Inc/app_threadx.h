@@ -43,7 +43,7 @@
 /* USER CODE BEGIN EC */
 //#define TX_APP_STACK_SIZE                                     	512
 
-#define THREAD_SIGNAL_GENERATOR_PRIO                       		10
+#define THREAD_SIGNAL_GENERATOR_PRIO                       			10
 #define THREAD_SIGNAL_GENERATOR_PRIO_PREEMPTION_THRESHOLD      	10
 
 #define THREAD_SAMPLING_CAPTURE_PRIO                          	10
