@@ -41,18 +41,30 @@
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define THREAD_SIGNAL_GENERATOR_PRIO                       			10
+//#define TX_APP_STACK_SIZE                                     	512
+
+#define THREAD_SIGNAL_GENERATOR_PRIO                       		10
 #define THREAD_SIGNAL_GENERATOR_PRIO_PREEMPTION_THRESHOLD      	10
 
-#define THREAD_SAMPLING_CAPTURE_PRIO                          	9
-#define THREAD_SAMPLING_CAPTURE_PREEMPTION_THRESHOLD          	9
+#define THREAD_SAMPLING_CAPTURE_PRIO                          	10
+#define THREAD_SAMPLING_CAPTURE_PREEMPTION_THRESHOLD          	10
 
-#define THREAD_SIGNAL_PROCESSING_PRIO                          	9//8
-#define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	9//8
+#define THREAD_SIGNAL_PROCESSING_PRIO                          	10
+#define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	10
 
 #define THREAD_SIGNAL_GENERATOR_EVT                           	0x01
 #define THREAD_SAMPLING_CAPTURE_EVT                           	0x02
 #define THREAD_SIGNAL_PROCESSING_EVT                           	0x03
+/*
+#ifndef TX_APP_THREAD_TIME_SLICE
+#define TX_APP_THREAD_TIME_SLICE                TX_NO_TIME_SLICE
+#endif
+
+#ifndef TX_APP_THREAD_AUTO_START
+#define TX_APP_THREAD_AUTO_START                TX_AUTO_START
+#endif
+*/
+
 /* USER CODE END EC */
 
 /* Private defines -----------------------------------------------------------*/
@@ -87,7 +99,7 @@
 /* Exported functions prototypes ---------------------------------------------*/
 UINT App_ThreadX_Init(VOID *memory_ptr);
 void MX_ThreadX_Init(void);
-void MainThread_thread_entry(ULONG thread_input);
+void MainThread_entry(ULONG thread_input);
 
 /* USER CODE BEGIN EFP */
 

@@ -57,6 +57,7 @@
   static uint32_t adc_channel_rate_ksps = 0;
   static uint32_t ffts_per_second = 0;
 
+  static uint32_t counter_signal = 0;
   static uint32_t counter_sampling = 0;
   static uint32_t counter_processing = 0;
 /* USER CODE END PV */
@@ -90,7 +91,7 @@ CHAR *pointer;
     return TX_POOL_ERROR;
   }
    /* Create Main Thread.  */
-  if (tx_thread_create(&tx_app_thread, "Main Thread", MainThread_thread_entry, 0, pointer,
+  if (tx_thread_create(&tx_app_thread, "Main Thread", MainThread_entry, 0, pointer,
                        TX_APP_STACK_SIZE, TX_APP_THREAD_PRIO, TX_APP_THREAD_PREEMPTION_THRESHOLD,
                        TX_APP_THREAD_TIME_SLICE, TX_APP_THREAD_AUTO_START) != TX_SUCCESS)
   {
@@ -98,6 +99,9 @@ CHAR *pointer;
   }
 
   /* USER CODE BEGIN App_ThreadX_Init */
+  //TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
+  //CHAR *pointer;
+
   /* Allocate the stack for ThreadFsk.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
                        TX_APP_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
@@ -156,48 +160,32 @@ CHAR *pointer;
   return ret;
 }
 /**
-  * @brief  Function implementing the MainThread_thread_entry thread.
+  * @brief  Function implementing the MainThread_entry thread.
   * @param  thread_input: Not used.
   * @retval None
   */
-void MainThread_thread_entry(ULONG thread_input)
+void MainThread_entry(ULONG thread_input)
 {
-  /* USER CODE BEGIN MainThread_thread_entry */
-	//ULONG   actual_flags = 0;
-	(void) thread_input;
-
-
-	initFftModule();
+  /* USER CODE BEGIN MainThread_entry */
 	startFskTransmission();
 	startFskSamplingCapture();
+	initFftModule();
 
-
-/*	if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_GENERATOR_EVT, TX_OR) != TX_SUCCESS)
-	{
-		Error_Handler();
-	}
-*/
 	/* Infinite loop */
 	while(1)
 	{
-		//printf("Main thread execution!\r\n");
 		tx_thread_sleep(100);
 		adc_total_time_seconds++;
 		adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
 		ffts_per_second = total_ffts / adc_total_time_seconds;
 		//printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX Freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
-		printf("Sampling: %lu, Processsing: %lu\r\n", counter_sampling, counter_processing);
-
+		printf("Signal: %lu, Sampling: %lu, Processsing: %lu\r\n", counter_signal, counter_sampling, counter_processing);
+		counter_signal = 0;
 		counter_sampling = 0;
 		counter_processing = 0;
-/*		 if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_PROCESSING_EVT, TX_OR) != TX_SUCCESS)
-			{
-				Error_Handler();
-			}
-*/
 	}
-  /* USER CODE END MainThread_thread_entry */
+  /* USER CODE END MainThread_entry */
 }
 
   /**
@@ -227,12 +215,13 @@ void MX_ThreadX_Init(void)
 void ThreadSignalGenerator_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
-  (void) thread_input;
+  //(void) thread_input;
 
   //startFskTransmission();
+  counter_signal++;
 
   /* Infinite loop */
-  while(1)
+/*  while(1)
   {
   	if (tx_event_flags_get(&EventFlag, THREAD_SIGNAL_GENERATOR_EVT, TX_OR_CLEAR,
   		  		                           &actual_flags, TX_WAIT_FOREVER) != TX_SUCCESS)
@@ -242,9 +231,13 @@ void ThreadSignalGenerator_Entry(ULONG thread_input)
   	else
   	{
   		//printf("Signal generator thread execution!\r\n");
+
+  		counter_signal++;
+
   		//TODO - Generation actions
   	}
   }
+*/
 }
 
 /**
@@ -255,7 +248,7 @@ void ThreadSignalGenerator_Entry(ULONG thread_input)
 void ThreadSamplingCapture_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
-  (void) thread_input;
+  //(void) thread_input;
 
   //startFskSamplingCapture();
 
@@ -274,12 +267,12 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 	  	//TODO - Sampling Capture actions
 	  	//printf("Sampling capture thread execution!\r\n");
 	  	counter_sampling++;
+	  	tx_thread_sleep(1);
 	  	//fillAndInterpolateFskAndRxBuffers();
-	    if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_PROCESSING_EVT, TX_OR) != TX_SUCCESS)
-	  	{
-	  		Error_Handler();
-	  	}
-
+//	    if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_PROCESSING_EVT, TX_OR) != TX_SUCCESS)
+//	  	{
+//	  		Error_Handler();
+//	  	}
 	  }
   }
 }
@@ -292,7 +285,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 void ThreadSignalProcessing_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
-  (void) thread_input;
+  //(void) thread_input;
 
 
   //initFftModule();
@@ -313,6 +306,7 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	  	// TODO - Processing signal actions
 	  	//printf("Processing signal thread execution!\r\n");
 	  	counter_processing++;
+	  	tx_thread_sleep(1);
 /*	  	getRx1Parameters();
 	  	getRx2Parameters();
 
@@ -322,6 +316,11 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 				second_half_fft_done = true;
 			}
 */
+//	    if (tx_event_flags_set(&EventFlag, THREAD_SAMPLING_CAPTURE_EVT, TX_OR) != TX_SUCCESS)
+//	  	{
+//	  		Error_Handler();
+//	  	}
+
 	  }
   }
 }

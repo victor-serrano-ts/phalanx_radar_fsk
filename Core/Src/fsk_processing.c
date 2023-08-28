@@ -15,10 +15,10 @@ static float32_t testOutput[LENGTH_SAMPLES/2];
 
 uint32_t total_ffts = 0;
 
-float32_t rx1_maxValue = 0.0;
-uint32_t rx1_maxIndex = 0;
-float32_t rx2_maxValue = 0.0;
-uint32_t rx2_maxIndex = 0;
+static float32_t rx1_maxValue = 0.0;
+static uint32_t rx1_maxIndex = 0;
+static float32_t rx2_maxValue = 0.0;
+static uint32_t rx2_maxIndex = 0;
 
 uint32_t rx1_freq = 0;
 uint32_t rx2_freq = 0;

@@ -67,8 +67,8 @@ all: main-build
 main-build: phalanx_radar_fsk.elf secondary-outputs
 
 # Tool invocations
-phalanx_radar_fsk.elf phalanx_radar_fsk.map: $(OBJS) $(USER_OBJS) /home/victor/STM32CubeIDE/new_workspace_1.13.1/phalanx_radar_fsk/STM32U575ZITXQ_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "phalanx_radar_fsk.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"/home/victor/STM32CubeIDE/new_workspace_1.13.1/phalanx_radar_fsk/STM32U575ZITXQ_FLASH.ld" --specs=nosys.specs -Wl,-Map="phalanx_radar_fsk.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+phalanx_radar_fsk.elf phalanx_radar_fsk.map: $(OBJS) $(USER_OBJS) /home/victor/STM32CubeIDE/workspace_1.13.1/phalanx_radar_fsk/STM32U575ZITXQ_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "phalanx_radar_fsk.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"/home/victor/STM32CubeIDE/workspace_1.13.1/phalanx_radar_fsk/STM32U575ZITXQ_FLASH.ld" --specs=nosys.specs -Wl,-Map="phalanx_radar_fsk.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
