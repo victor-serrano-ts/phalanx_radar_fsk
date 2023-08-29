@@ -143,7 +143,7 @@ CHAR *pointer;
 
  /* Create SignalProcessing.  */
  if (tx_thread_create(&ThreadSignalProcessing, "Thread SignalProcessing", ThreadSignalProcessing_Entry, 0,
-                      pointer,  TX_APP_STACK_SIZE,
+                      pointer,  1024/*TX_APP_STACK_SIZE*/,
 											THREAD_SIGNAL_PROCESSING_PRIO, THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD,
                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
  {
@@ -179,15 +179,15 @@ void MainThread_entry(ULONG thread_input)
 		adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
 		ffts_per_second = total_ffts / adc_total_time_seconds;
-		//printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX2 freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
+		printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX2 freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
 		printf("Signal: %lu, Sampling: %lu, Processsing: %lu\r\n", counter_signal, counter_sampling, counter_processing);
-		printf("adc_half_count: %lu, adc_full_count: %lu\r\n",adc_half_count, adc_full_count);
+		//printf("adc_half_count: %lu, adc_full_count: %lu\r\n",adc_half_count, adc_full_count);
 		counter_signal = 0;
 		counter_sampling = 0;
 		counter_processing = 0;
 
-adc_half_count = 0;
-adc_full_count = 0;
+//adc_half_count = 0;
+//adc_full_count = 0;
 	}
   /* USER CODE END MainThread_entry */
 }
@@ -269,7 +269,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 	  	//printf("Sampling capture thread execution!\r\n");
 	  	counter_sampling++;
 
-	  	//fillAndInterpolateFskAndRxBuffers();
+	  	fillAndInterpolateFskAndRxBuffers();
 	    if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_PROCESSING_EVT, TX_OR) != TX_SUCCESS)
 	  	{
 	  		Error_Handler();
@@ -304,7 +304,7 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	  	// TODO - Processing signal actions
 	  	//printf("Processing signal thread execution!\r\n");
 	  	counter_processing++;
-/*	  	getRx1Parameters();
+	  	getRx1Parameters();
 	  	getRx2Parameters();
 
 	  	if (first_half_data_ready) {
@@ -312,7 +312,7 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 			} else {
 				second_half_fft_done = true;
 			}
-*/
+
 
 //	  	tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
 	  }
