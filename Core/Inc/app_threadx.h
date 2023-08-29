@@ -52,9 +52,13 @@
 #define THREAD_SIGNAL_PROCESSING_PRIO                          	10
 #define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	10
 
+#define THREAD_EVENT_DETECTOR_PRIO                          		10
+#define THREAD_EVENT_DETECTOR_PREEMPTION_THRESHOLD          		10
+
 #define THREAD_SIGNAL_GENERATOR_EVT                           	0x01
 #define THREAD_SAMPLING_CAPTURE_EVT                           	0x02
 #define THREAD_SIGNAL_PROCESSING_EVT                           	0x04
+#define THREAD_EVENT_DETECTOR_EVT                           		0x08
 /*
 #ifndef TX_APP_THREAD_TIME_SLICE
 #define TX_APP_THREAD_TIME_SLICE                TX_NO_TIME_SLICE
@@ -72,7 +76,10 @@
 #define TX_APP_THREAD_PRIO                                         5
 
 /* USER CODE BEGIN PD */
-
+#define TX_SIGNAL_GENERATOR_STACK_SIZE															512
+#define TX_SAMPLING_CAPTURE_STACK_SIZE															512
+#define TX_SIGNAL_PROCESSING_STACK_SIZE															1024
+#define TX_EVENT_DETECTOR_STACK_SIZE																512
 /* USER CODE END PD */
 
 /* Main thread defines -------------------------------------------------------*/

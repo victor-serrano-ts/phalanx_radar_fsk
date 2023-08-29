@@ -14,7 +14,6 @@
 /* Constants */
 #define LENGTH_SAMPLES 					2048
 #define FFT_SIZE 								1024
-//#define SAMPLE_FREQ 						100000
 
 /* Functions */
 void initFftModule(void);
@@ -28,7 +27,6 @@ uint32_t getRx2frequency(void);
 
 extern uint32_t rx1_freq;
 extern uint32_t rx2_freq;
-
 extern uint32_t total_ffts;
 
 #endif /* FSK_PROCESSING_H_ */

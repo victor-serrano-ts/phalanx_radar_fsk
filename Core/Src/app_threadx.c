@@ -50,6 +50,7 @@
   TX_THREAD ThreadSignalGenerator;
   TX_THREAD ThreadSamplingCapture;
   TX_THREAD ThreadSignalProcessing;
+  TX_THREAD ThreadEventDetector;
   TX_EVENT_FLAGS_GROUP EventFlag;
 
   static uint32_t adc_total_time_seconds = 0;
@@ -60,6 +61,7 @@
   static uint32_t counter_signal = 0;
   static uint32_t counter_sampling = 0;
   static uint32_t counter_processing = 0;
+  static uint32_t counter_detector = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,6 +69,7 @@
   void ThreadSignalGenerator_Entry(ULONG thread_input);
   void ThreadSamplingCapture_Entry(ULONG thread_input);
   void ThreadSignalProcessing_Entry(ULONG thread_input);
+  void ThreadEventDetector_Entry(ULONG thread_input);
 /* USER CODE END PFP */
 
 /**
@@ -104,14 +107,14 @@ CHAR *pointer;
 
   /* Allocate the stack for ThreadFsk.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
-                       TX_APP_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+		 TX_SIGNAL_GENERATOR_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
  {
    ret = TX_POOL_ERROR;
  }
 
  /* Create SignalGenerator.  */
  if (tx_thread_create(&ThreadSignalGenerator, "Thread Signal Generator", ThreadSignalGenerator_Entry, 0,
-                      pointer,  TX_APP_STACK_SIZE,
+                      pointer,  TX_SIGNAL_GENERATOR_STACK_SIZE,
 											THREAD_SIGNAL_GENERATOR_PRIO, THREAD_SIGNAL_GENERATOR_PRIO_PREEMPTION_THRESHOLD,
                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
  {
@@ -120,14 +123,14 @@ CHAR *pointer;
 
  /* Allocate the stack for ThreadSamplingCapture.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
-                       TX_APP_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+		 TX_SAMPLING_CAPTURE_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
  {
    ret = TX_POOL_ERROR;
  }
 
  /* Create SamplingCapture.  */
  if (tx_thread_create(&ThreadSamplingCapture, "Thread Sampling Capture", ThreadSamplingCapture_Entry, 0,
-                      pointer,  TX_APP_STACK_SIZE,
+                      pointer,  TX_SAMPLING_CAPTURE_STACK_SIZE,
 											THREAD_SAMPLING_CAPTURE_PRIO, THREAD_SAMPLING_CAPTURE_PREEMPTION_THRESHOLD,
                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
  {
@@ -136,15 +139,31 @@ CHAR *pointer;
 
  /* Allocate the stack for ThreadSignalProcessing.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
-                       TX_APP_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+		 TX_SIGNAL_PROCESSING_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
  {
    ret = TX_POOL_ERROR;
  }
 
  /* Create SignalProcessing.  */
  if (tx_thread_create(&ThreadSignalProcessing, "Thread SignalProcessing", ThreadSignalProcessing_Entry, 0,
-                      pointer,  1024/*TX_APP_STACK_SIZE*/,
+                      pointer,  TX_SIGNAL_PROCESSING_STACK_SIZE,
 											THREAD_SIGNAL_PROCESSING_PRIO, THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD,
+                      TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
+ {
+   ret = TX_THREAD_ERROR;
+ }
+
+ /* Allocate the stack for ThreadEventDetector.  */
+ if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
+		 TX_EVENT_DETECTOR_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+ {
+   ret = TX_POOL_ERROR;
+ }
+
+ /* Create EventDetector.  */
+ if (tx_thread_create(&ThreadEventDetector, "Thread EventDetector", ThreadEventDetector_Entry, 0,
+                      pointer,  TX_EVENT_DETECTOR_STACK_SIZE,
+											THREAD_EVENT_DETECTOR_PRIO, THREAD_EVENT_DETECTOR_PREEMPTION_THRESHOLD,
                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
  {
    ret = TX_THREAD_ERROR;
@@ -167,9 +186,10 @@ CHAR *pointer;
 void MainThread_entry(ULONG thread_input)
 {
   /* USER CODE BEGIN MainThread_entry */
-	startFskTransmission();
+/*	startFskTransmission();
 	startFskSamplingCapture();
 	initFftModule();
+*/
 
 	/* Infinite loop */
 	while(1)
@@ -185,9 +205,10 @@ void MainThread_entry(ULONG thread_input)
 		counter_signal = 0;
 		counter_sampling = 0;
 		counter_processing = 0;
+		counter_detector = 0;
 
-//adc_half_count = 0;
-//adc_full_count = 0;
+		//adc_half_count = 0;
+		//adc_full_count = 0;
 	}
   /* USER CODE END MainThread_entry */
 }
@@ -219,9 +240,8 @@ void MX_ThreadX_Init(void)
 void ThreadSignalGenerator_Entry(ULONG thread_input)
 {
 	//ULONG   actual_flags = 0;
-  //(void) thread_input;
 
-  //startFskTransmission();
+  startFskTransmission();
   counter_signal++;
 
   /* Infinite loop */
@@ -253,7 +273,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
 
-  //startFskSamplingCapture();
+  startFskSamplingCapture();
 
   /* Infinite loop */
   while(1)
@@ -286,10 +306,9 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 void ThreadSignalProcessing_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
-  //(void) thread_input;
 
 
-  //initFftModule();
+  initFftModule();
 
   /* Infinite loop */
   while(1)
@@ -316,6 +335,22 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 
 //	  	tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
 	  }
+  }
+}
+
+/**
+  * @brief  Function implementing the ThreadEventProcessing thread.
+  * @param  thread_input: Not used
+  * @retval None
+  */
+void ThreadEventDetector_Entry(ULONG thread_input)
+{
+
+  /* Infinite loop */
+  while(1)
+  {
+  	counter_detector++;
+	  	//tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
   }
 }
 /* USER CODE END 1 */
