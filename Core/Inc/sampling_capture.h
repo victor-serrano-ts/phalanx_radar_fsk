@@ -23,12 +23,15 @@
 #define ADC_RX2_I_OFFSET 2
 #define ADC_RX2_Q_OFFSET 3
 #define ADC_FSK_OFFSET   4
+
 /* FSK Functions */
 void startFskSamplingCapture(void);
 void stopFskSamplingCapture(void);
+void fillAndInterpolateFskAndRxBuffers(void);
+
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc);
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
-void fillAndInterpolateFskAndRxBuffers(void);
+
 /* FSK Variables */
 extern uint32_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
 extern float fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL];

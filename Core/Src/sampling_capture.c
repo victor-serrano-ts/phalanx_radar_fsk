@@ -10,13 +10,13 @@
 
 uint32_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE] = {0};
 
-float fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL] = {0};
-float rx1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
-float rx2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
-float rx1_f1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
-float rx1_f2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
-float rx2_f1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
-float rx2_f2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
+float32_t fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL] = {0};
+float32_t rx1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
+float32_t rx2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
+float32_t rx1_f1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
+float32_t rx1_f2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
+float32_t rx2_f1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
+float32_t rx2_f2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2] = {0};
 
 bool first_half_data_ready = false;
 bool first_half_fft_done = false;
@@ -32,10 +32,7 @@ uint32_t adc_half_count = 0;
   */
 void startFskSamplingCapture(void)
 {
-  if (HAL_ADC_Start_DMA(&hadc4,
-                        (uint32_t *)aADCxConvertedData,
-                        (ADC_CONVERTED_DATA_BUFFER_SIZE)
-                       ) != HAL_OK)
+  if (HAL_ADC_Start_DMA(&hadc4, (uint32_t *)aADCxConvertedData, (ADC_CONVERTED_DATA_BUFFER_SIZE)) != HAL_OK)
   {
     Error_Handler();
   }

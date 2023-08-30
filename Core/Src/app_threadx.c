@@ -53,6 +53,9 @@
   TX_THREAD ThreadEventDetector;
   TX_EVENT_FLAGS_GROUP EventFlag;
 
+  TX_QUEUE tx_app_msg_queue;
+  //TX_QUEUE MsgQueueTwo;
+
   static uint32_t adc_total_time_seconds = 0;
   static uint32_t adc_total_rate_ksps = 0;
   static uint32_t adc_channel_rate_ksps = 0;
@@ -83,7 +86,8 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
   TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
 
   /* USER CODE BEGIN App_ThreadX_MEM_POOL */
-
+  //TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
+  //CHAR *pointer;
   /* USER CODE END App_ThreadX_MEM_POOL */
 CHAR *pointer;
 
@@ -102,8 +106,6 @@ CHAR *pointer;
   }
 
   /* USER CODE BEGIN App_ThreadX_Init */
-  //TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
-  //CHAR *pointer;
 
   /* Allocate the stack for ThreadFsk.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
@@ -306,6 +308,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 void ThreadSignalProcessing_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
+	fsk_result_t detection_result;
 
 
   initFftModule();
@@ -323,34 +326,32 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	  	// TODO - Processing signal actions
 	  	//printf("Processing signal thread execution!\r\n");
 	  	counter_processing++;
-	  	getRx1Parameters();
-	  	getRx2Parameters();
+	  	detection_result = getDetectionParameters();
 
 	  	if (first_half_data_ready) {
 				first_half_fft_done = true;
 			} else {
 				second_half_fft_done = true;
 			}
-
-
 //	  	tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
 	  }
   }
 }
 
 /**
-  * @brief  Function implementing the ThreadEventProcessing thread.
+  * @brief  Function implementing the ThreadEventDetector thread.
   * @param  thread_input: Not used
   * @retval None
   */
 void ThreadEventDetector_Entry(ULONG thread_input)
 {
 
-  /* Infinite loop */
-  while(1)
-  {
-  	counter_detector++;
-	  	//tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
-  }
+//  /* Infinite loop */
+//  while(1)
+//  {
+//  	counter_detector++;
+//	  	//tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
+//  	tx_thread_sleep(1000);
+//  }
 }
 /* USER CODE END 1 */

@@ -8,7 +8,6 @@
 #include "fsk_generator.h"
 #include <stdint.h>
 
-//DMA_QListTypeDef DACQueue;
 
 uint32_t data_sin[32]  = {
 		4020, 4020, 4020, 4020, 4020, 4020, 4020, 4020,
@@ -39,6 +38,18 @@ void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma)
 	asm("NOP");
 }
 
+void setConfigPll(pll_fsk_config_t *config)
+{
+	//Send config to PLL over microWire protocol
+
+}
+
+void setPllState(pll_state_t state)
+{
+	// Send state to PLL over microWire protocol
+
+}
+
 /**
   * @brief  Function implementing start FSK signal transmission.
   * @param  None
@@ -46,6 +57,17 @@ void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma)
   */
 void startFskTransmission(void)
 {
+	pll_fsk_config_t pll_config;
+
+	pll_config.freq_desviation = 0x666619; 		// 6710809 = 0x666619 = 2MHz
+	pll_config.mod_pin = 0x7;									// 7 = input
+	pll_config.fsk_trigger_src = 0x1; 				// 1 = trigger A
+	pll_config.trigger_src_def = 0x3;					// 3 = MOD rising edge
+
+//	setConfigPll(&pll_config);
+
+//	setPllState(PLL_ENABLE);
+
 	if (HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, &data_sin[0], sizeof(data_sin)/sizeof(data_sin[0]), DAC_ALIGN_12B_R) != HAL_OK)
 	{
 		/* Start DMA Error */
@@ -65,5 +87,13 @@ void stopFskTransmission(void)
 		/* Stop DMA Error */
 		Error_Handler();
 	}
+
+//	setPllState(PLL_DISABLE);
+
+//	/* For future PLL control */
+//  if(HAL_TIM_PWM_Stop(&htim5,TIM_CHANNEL_3) != HAL_OK)
+//  {
+//	  Error_Handler();
+//  }
 }
 

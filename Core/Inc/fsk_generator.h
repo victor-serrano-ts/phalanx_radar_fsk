@@ -14,12 +14,28 @@
 
 /* Constants */
 
+/* Types */
+typedef struct {
+	uint32_t freq_desviation; 		// 2MHz = 6710809
+	uint8_t mod_pin;							// 7 = input
+	uint8_t fsk_trigger_src;      // 1 = trigger A
+	uint8_t trigger_src_def;			// 3 = MOD rising edge
+}pll_fsk_config_t;
+
+typedef enum {
+	PLL_DISABLE = 0,
+	PLL_ENABLE = 1
+}pll_state_t;
+
 /* Functions */
-void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma);
+void setConfigPll(pll_fsk_config_t *config);
+void setPllState(pll_state_t state);
 void startFskTransmission(void);
 void stopFskTransmission(void);
 
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma);
+
 /* Variables */
-//extern DMA_QListTypeDef DACQueue;
+
 
 #endif /* FSK_GENERATOR_H_ */
