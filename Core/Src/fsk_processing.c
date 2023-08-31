@@ -43,7 +43,7 @@ rx2_freq = getFrequency(&rx2[0]); // Delete, only test !!!
 	//Calculate bin level
 	detection_results.bin_level = getBinLevel();
 	//Calculate frequency
-	//detection_results.frequency_hz = getFrequency(&rx1[0);
+	detection_results.frequency_hz = (float32_t)1524.2; /*getFrequency(&rx1[0]);*/
 	//Calculate angle
 	detection_results.angle = getAngle();
 	//Calculate speed
@@ -67,7 +67,7 @@ rx2_freq = getFrequency(&rx2[0]); // Delete, only test !!!
   */
 float32_t getBinLevel(void)
 {
-	float32_t bin_level_t = 0.0;
+	float32_t bin_level_t = 322.2;
 
 
 	return bin_level_t;
@@ -102,7 +102,7 @@ float32_t getFrequency(float32_t * rx_data_samples)
   */
 float32_t getAngle(void)
 {
-	float32_t angle_t = 0.0;
+	float32_t angle_t = 12.8;
 
 
 
@@ -116,7 +116,7 @@ float32_t getAngle(void)
   */
 float32_t getSpeed(void)
 {
-	float32_t speed_t = 0.0;
+	float32_t speed_t = 89.9;
 
 
 
@@ -130,7 +130,7 @@ float32_t getSpeed(void)
   */
 float32_t getDistance(void)
 {
-	float32_t distance_t = 0.0;
+	float32_t distance_t = 2.43;
 
 
 
@@ -144,7 +144,7 @@ float32_t getDistance(void)
   */
 uint32_t getMotion(void)
 {
-	uint32_t motion_t = 0;
+	uint32_t motion_t = REVERSE_DIRECTION;//0;
 
 
 
@@ -158,7 +158,7 @@ uint32_t getMotion(void)
   */
 float32_t getNoise(void)
 {
-	float32_t noise_t = 0.0;
+	float32_t noise_t = 15.7;
 
 
 
@@ -167,7 +167,7 @@ float32_t getNoise(void)
 
 int32_t getAccMax(void)
 {
-	int32_t acc_max_t = 0;
+	int32_t acc_max_t = 4500;
 
 
 	return acc_max_t;

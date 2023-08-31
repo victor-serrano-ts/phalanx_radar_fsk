@@ -155,6 +155,8 @@ CHAR *pointer;
    ret = TX_THREAD_ERROR;
  }
 
+
+
  /* Allocate the stack for ThreadEventDetector.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
 		 TX_EVENT_DETECTOR_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
@@ -169,6 +171,13 @@ CHAR *pointer;
                       TX_NO_TIME_SLICE, TX_AUTO_START) != TX_SUCCESS)
  {
    ret = TX_THREAD_ERROR;
+ }
+
+ /* Create the tx_app_msg_queue shared by MsgSenderThreadTwo and MsgReceiverThread.  */
+ if (tx_queue_create(&tx_app_msg_queue, "App Mssg Queue", TX_APP_SINGLE_MSG_SIZE,
+                     pointer, TX_APP_MSG_QUEUE_FULL_SIZE *sizeof(ULONG)) != TX_SUCCESS)
+ {
+   ret = TX_QUEUE_ERROR;
  }
 
  /* Create the event flags group.  */
@@ -202,7 +211,7 @@ void MainThread_entry(ULONG thread_input)
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
 		ffts_per_second = total_ffts / adc_total_time_seconds;
 		printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX2 freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
-		printf("Signal: %lu, Sampling: %lu, Processsing: %lu\r\n", counter_signal, counter_sampling, counter_processing);
+		printf("Signal: %lu, Sampling: %lu, Processsing: %lu, Detector: %lu\r\n", counter_signal, counter_sampling, counter_processing, counter_detector);
 		//printf("adc_half_count: %lu, adc_full_count: %lu\r\n",adc_half_count, adc_full_count);
 		counter_signal = 0;
 		counter_sampling = 0;
@@ -308,7 +317,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 void ThreadSignalProcessing_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
-	fsk_result_t detection_result;
+	fsk_result_t detection_result_snd;
 
 
   initFftModule();
@@ -326,13 +335,19 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	  	// TODO - Processing signal actions
 	  	//printf("Processing signal thread execution!\r\n");
 	  	counter_processing++;
-	  	detection_result = getDetectionParameters();
+	  	detection_result_snd = getDetectionParameters();
 
 	  	if (first_half_data_ready) {
 				first_half_fft_done = true;
 			} else {
 				second_half_fft_done = true;
 			}
+	  	/* Send message to ThreadEventDetector.  */
+			if (tx_queue_send(&tx_app_msg_queue, &detection_result_snd, TX_NO_WAIT/*TX_WAIT_FOREVER*/) != TX_SUCCESS)
+			{
+				Error_Handler();
+			}
+	  	    /* Sleep for 500s */
 //	  	tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
 	  }
   }
@@ -345,13 +360,27 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
   */
 void ThreadEventDetector_Entry(ULONG thread_input)
 {
+	fsk_result_t detection_result_rcv;
+	UINT status = 0 ;
 
-//  /* Infinite loop */
-//  while(1)
-//  {
-//  	counter_detector++;
-//	  	//tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
-//  	tx_thread_sleep(1000);
-//  }
+  /* Infinite loop */
+  while(1)
+  {
+  	counter_detector++;
+    status = tx_queue_receive(&tx_app_msg_queue, &detection_result_rcv, TX_WAIT_FOREVER/*TX_NO_WAIT*/);
+    if ( status == TX_SUCCESS)
+    {
+    	printf("bin: %f, freq: %f, angel: %f, speed: %f, distance: %f, motion: %lu, noise: %f, acc: %ld\r\n",
+    			detection_result_rcv.bin_level,
+					detection_result_rcv.frequency_hz,
+					detection_result_rcv.angle,
+					detection_result_rcv.speed_kmh,
+					detection_result_rcv.distance,
+					detection_result_rcv.motion,
+					detection_result_rcv.noise,
+					detection_result_rcv.acc_max);
+    	//printf("Mssg_Rcv!!\r\n");
+    }
+  }
 }
 /* USER CODE END 1 */

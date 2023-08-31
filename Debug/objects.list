@@ -1,5 +1,6 @@
 "./AZURE_RTOS/App/app_azure_rtos.o"
 "./Core/Src/app_threadx.o"
+"./Core/Src/events.o"
 "./Core/Src/fsk_generator.o"
 "./Core/Src/fsk_processing.o"
 "./Core/Src/linked_list.o"

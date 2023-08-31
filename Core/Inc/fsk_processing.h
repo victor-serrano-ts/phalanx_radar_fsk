@@ -28,6 +28,11 @@ typedef struct {
 	int32_t acc_max;
 } fsk_result_t;
 
+enum {
+	NORMAL_DIRECTION = 0,
+	REVERSE_DIRECTION
+};
+
 /* Functions */
 void initFftModule(void);
 
