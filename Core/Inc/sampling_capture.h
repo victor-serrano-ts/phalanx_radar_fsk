@@ -25,22 +25,54 @@
 #define ADC_FSK_OFFSET   4
 
 /* FSK Functions */
-void startFskSamplingCapture(void);
-void stopFskSamplingCapture(void);
-void fillAndInterpolateFskAndRxBuffers(void);
 
+/**
+  * @brief  Function implementing start FSK signal sampling capture.
+  * @param  None
+  * @retval None
+  */
+void start_fsk_sampling_capture(void);
+/**
+  * @brief  Function implementing stop FSK signal sampling capture.
+  * @param  None
+  * @retval None
+  */
+void stop_fsk_sampling_capture(void);
+/**
+  * @brief  Function implementing RX ADC samples captured after fsk transmision.
+  * @param  None
+  * @retval None
+  */
+void fill_and_interpolate_fsk_rx_buffers(void);
+
+/**
+  * @brief  Conversion complete callback in non-blocking mode
+  * @param  hadc: ADC handle
+  * @retval None
+  */
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc);
+/**
+  * @brief  Conversion DMA half-transfer callback in non-blocking mode
+  * @param  hadc: ADC handle
+  * @retval None
+  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
 
 /* FSK Variables */
 extern uint32_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
-extern float fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL];
-extern float rx1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float rx2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float rx1_f1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float rx1_f2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float rx2_f1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float rx2_f2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL];
+extern float32_t rx1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+
+extern float32_t rx1_f1_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx1_f1_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx1_f2_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx1_f2_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx2_f1_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx2_f1_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+//extern float32_t rx2_f2_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+//extern float32_t rx2_f2_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+
 
 extern bool first_half_data_ready;
 extern bool first_half_fft_done;

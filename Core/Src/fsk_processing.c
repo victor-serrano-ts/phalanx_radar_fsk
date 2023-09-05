@@ -11,74 +11,48 @@
 static arm_cfft_instance_f32 varInstCfftF32;
 static uint32_t ifftFlag = 0;
 static uint32_t doBitReverse = 1;
-static float32_t testOutput[LENGTH_SAMPLES/2];
+static float32_t testOutput[FSK_LENGTH_SAMPLES/2];
 
 uint32_t total_ffts = 0;
 uint32_t rx1_freq = 0;
 uint32_t rx2_freq = 0;
 
 
-/**
-  * @brief  Function implementing FFT module initialization
-  * @param  None
-  * @retval None
-  */
-void initFftModule(void)
+
+void init_fft_module(void)
 {
-	arm_cfft_init_f32(&varInstCfftF32,FFT_SIZE);
+	arm_cfft_init_f32(&varInstCfftF32,FSK_FFT_SIZE);
 }
 
-/**
-  * @brief  Function implementing get bin, frequency, angle, speed, distance, motion and noise parameters for RX1
-  * @param  None
-  * @retval None
-  */
-fsk_result_t getDetectionParameters(void)
+fsk_result_t get_detection_parameters(void)
 {
 	fsk_result_t detection_results;
 
-rx1_freq = getFrequency(&rx1[0]); // Delete, only test!!!
-rx2_freq = getFrequency(&rx2[0]); // Delete, only test !!!
+rx1_freq = get_frequency(&rx1[0]); // Delete, only test !!!
+rx2_freq = get_frequency(&rx2[0]); // Delete, only test !!!
 
-	//Calculate bin level
-	detection_results.bin_level = getBinLevel();
-	//Calculate frequency
-	detection_results.frequency_hz = (float32_t)1524.2; /*getFrequency(&rx1[0]);*/
-	//Calculate angle
-	detection_results.angle = getAngle();
-	//Calculate speed
-	detection_results.speed_kmh = getSpeed();
-	//Calculate distance
-	detection_results.distance = getDistance();
-	//Calculate motion
-	detection_results.motion = getMotion();
-	//Calculate noise
-	detection_results.noise = getNoise();
-	//Get acceleration parameter
-	detection_results.acc_max = getAccMax();
+
+	fsk_process(&detection_results, rx1_f1_i, rx1_f1_q);
 
 	return detection_results;
 }
 
-/**
-  * @brief  Function implementing get bin level detected
-  * @param  None
-  * @retval float32_t
-  */
-float32_t getBinLevel(void)
+void fsk_process(fsk_result_t *result, const float32_t *signal_i, const float32_t *signal_q)
 {
-	float32_t bin_level_t = 322.2;
+	uint32_t max_bin;
 
 
-	return bin_level_t;
 }
 
-/**
-  * @brief  Function implementing get frequency detected
-  * @param  None
-  * @retval float
-  */
-float32_t getFrequency(float32_t * rx_data_samples)
+//float32_t getBinLevel(void)
+//{
+//	float32_t bin_level_t = 322.2;//0.0;
+//
+//
+//	return bin_level_t;
+//}
+
+float32_t get_frequency(float32_t *rx_data_samples)
 {
   float32_t rx_maxValue = 0.0;
   uint32_t rx_maxIndex = 0;
@@ -86,92 +60,72 @@ float32_t getFrequency(float32_t * rx_data_samples)
 
 
 	arm_cfft_f32(&varInstCfftF32, rx_data_samples, ifftFlag, doBitReverse);
-	arm_cmplx_mag_squared_f32(rx_data_samples, testOutput, FFT_SIZE);
+	arm_cmplx_mag_squared_f32(rx_data_samples, testOutput, FSK_FFT_SIZE);
 	testOutput[0] = 0;
-	arm_max_f32(testOutput, FFT_SIZE, &rx_maxValue, &rx_maxIndex);
-	frequency_t = SAMPLE_FREQ * rx_maxIndex / FFT_SIZE;
+	arm_max_f32(testOutput, FSK_FFT_SIZE, &rx_maxValue, &rx_maxIndex);
+	frequency_t = SAMPLE_FREQ * rx_maxIndex / FSK_FFT_SIZE;
 	total_ffts++;
 
 	return frequency_t;
 }
 
-/**
-  * @brief  Function implementing get angle detected
-  * @param  None
-  * @retval float32_t
-  */
-float32_t getAngle(void)
-{
-	float32_t angle_t = 12.8;
+
+//float32_t getAngle(void)
+//{
+//	float32_t angle_t = 12.8;//0.0;
+//
+//
+//
+//	return angle_t;
+//}
 
 
-
-	return angle_t;
-}
-
-/**
-  * @brief  Function implementing get speed detected
-  * @param  None
-  * @retval float32_t
-  */
-float32_t getSpeed(void)
-{
-	float32_t speed_t = 89.9;
+//float32_t getSpeed(void)
+//{
+//	float32_t speed_t = 89.9;//0.0;
+//
+//
+//
+//	return speed_t;
+//}
 
 
-
-	return speed_t;
-}
-
-/**
-  * @brief  Function implementing get distance detected (cm or m?)
-  * @param  None
-  * @retval float32_t
-  */
-float32_t getDistance(void)
-{
-	float32_t distance_t = 2.43;
+//float32_t getDistance(void)
+//{
+//	float32_t distance_t = 2.43;//0.0;
+//
+//
+//
+//	return distance_t;
+//}
 
 
-
-	return distance_t;
-}
-
-/**
-  * @brief  Function implementing get motion detected
-  * @param  None
-  * @retval uint32_t
-  */
-uint32_t getMotion(void)
-{
-	uint32_t motion_t = REVERSE_DIRECTION;//0;
+//uint32_t getMotion(void)
+//{
+//	uint32_t motion_t = MOTION_APPROACHING;//0;
+//
+//
+//
+//	return motion_t;
+//}
 
 
+//float32_t getNoise(void)
+//{
+//	float32_t noise_t = 15.7;//0.0;
+//
+//
+//
+//	return noise_t;
+//}
 
-	return motion_t;
-}
-
-/**
-  * @brief  Function implementing get noise detected
-  * @param  None
-  * @retval float32_t
-  */
-float32_t getNoise(void)
-{
-	float32_t noise_t = 15.7;
-
-
-
-	return noise_t;
-}
-
-int32_t getAccMax(void)
-{
-	int32_t acc_max_t = 4500;
-
-
-	return acc_max_t;
-}
+//int32_t getAccMax(void)
+//{
+//	int32_t acc_max_t = 4500;//0;
+//
+//
+//	return acc_max_t;
+//}
 
 ///**
 //  * @brief  Function implementing get bin, frequency, angle, speed, distance, motion and noise parameters for RX2

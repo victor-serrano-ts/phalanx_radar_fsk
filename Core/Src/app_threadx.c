@@ -27,10 +27,26 @@
 #include "sampling_capture.h"
 #include "fsk_generator.h"
 #include "fsk_processing.h"
+#include "events.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+/** @brief RADAR control state machine states. */
+typedef enum
+{
+//    FSK_RADAR_ST_TURN_ON = 0,
+//    FSK_RADAR_ST_IDLE,
+    FSK_RADAR_ST_DETECTING,
+    FSK_RADAR_ST_DETECTED,
+//    FSK_RADAR_ST_SLEEP,
+} fsk_radar_st_t;
+
+/** Radar control state machine current state. */
+static fsk_radar_st_t fsk_radar_st;
+
+/** Radar event detected. */
+static event_t fsk_event_result;
 
 /* USER CODE END PTD */
 
@@ -155,8 +171,6 @@ CHAR *pointer;
    ret = TX_THREAD_ERROR;
  }
 
-
-
  /* Allocate the stack for ThreadEventDetector.  */
  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
 		 TX_EVENT_DETECTOR_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
@@ -252,7 +266,7 @@ void ThreadSignalGenerator_Entry(ULONG thread_input)
 {
 	//ULONG   actual_flags = 0;
 
-  startFskTransmission();
+  start_fsk_transmission();
   counter_signal++;
 
   /* Infinite loop */
@@ -284,7 +298,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 {
 	ULONG   actual_flags = 0;
 
-  startFskSamplingCapture();
+  start_fsk_sampling_capture();
 
   /* Infinite loop */
   while(1)
@@ -300,7 +314,7 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 	  	//printf("Sampling capture thread execution!\r\n");
 	  	counter_sampling++;
 
-	  	fillAndInterpolateFskAndRxBuffers();
+	  	fill_and_interpolate_fsk_rx_buffers();
 	    if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_PROCESSING_EVT, TX_OR) != TX_SUCCESS)
 	  	{
 	  		Error_Handler();
@@ -320,7 +334,7 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	fsk_result_t detection_result_snd;
 
 
-  initFftModule();
+  init_fft_module();
 
   /* Infinite loop */
   while(1)
@@ -335,7 +349,7 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	  	// TODO - Processing signal actions
 	  	//printf("Processing signal thread execution!\r\n");
 	  	counter_processing++;
-	  	detection_result_snd = getDetectionParameters();
+	  	detection_result_snd = get_detection_parameters();
 
 	  	if (first_half_data_ready) {
 				first_half_fft_done = true;
@@ -347,8 +361,6 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 			{
 				Error_Handler();
 			}
-	  	    /* Sleep for 500s */
-//	  	tx_queue_send (&queue_1, send_message_1, TX_NO_WAIT);
 	  }
   }
 }
@@ -361,7 +373,11 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 void ThreadEventDetector_Entry(ULONG thread_input)
 {
 	fsk_result_t detection_result_rcv;
-	UINT status = 0 ;
+	UINT status = 0;
+
+	set_default_params();
+
+	fsk_radar_st = FSK_RADAR_ST_DETECTING;
 
   /* Infinite loop */
   while(1)
@@ -370,16 +386,47 @@ void ThreadEventDetector_Entry(ULONG thread_input)
     status = tx_queue_receive(&tx_app_msg_queue, &detection_result_rcv, TX_WAIT_FOREVER/*TX_NO_WAIT*/);
     if ( status == TX_SUCCESS)
     {
-    	printf("bin: %f, freq: %f, angel: %f, speed: %f, distance: %f, motion: %lu, noise: %f, acc: %ld\r\n",
-    			detection_result_rcv.bin_level,
-					detection_result_rcv.frequency_hz,
-					detection_result_rcv.angle,
-					detection_result_rcv.speed_kmh,
-					detection_result_rcv.distance,
-					detection_result_rcv.motion,
-					detection_result_rcv.noise,
-					detection_result_rcv.acc_max);
+//    	printf("bin: %f, freq: %f, angel: %f, speed: %f, distance: %f, motion: %lu, noise: %f\r\n",
+//    			detection_result_rcv.bin_level,
+//					detection_result_rcv.frequency_hz,
+//					detection_result_rcv.angle,
+//					detection_result_rcv.speed_kmh,
+//					detection_result_rcv.distance,
+//					detection_result_rcv.motion,
+//					detection_result_rcv.noise_level);
     	//printf("Mssg_Rcv!!\r\n");
+
+    	switch(fsk_radar_st)
+    	{
+				case FSK_RADAR_ST_DETECTING:
+
+					// Detect possible events
+					fsk_event_result = event_detect(&detection_result_rcv, 100);
+          // If an event is detected, save more fsk samples before saving
+          // the event
+          if (fsk_event_result != EVENT_NONE)
+          {
+						if (fsk_event_result== EVENT_FAST) {
+							printf("fast_event\r\n");
+						} else {
+							fsk_radar_st = FSK_RADAR_ST_DETECTED;
+						}
+          }
+					break;
+
+				case FSK_RADAR_ST_DETECTED:
+
+					fsk_event_result = wait_for_more_events(&detection_result_rcv, 100);
+
+					if((fsk_event_result != EVENT_NONE) && (fsk_event_result != EVENT_FAST)) {
+						printf("event %d detected!\r\n", fsk_event_result);
+					}
+					else
+					{
+						fsk_radar_st = FSK_RADAR_ST_DETECTED;
+					}
+					break;
+    	}
     }
   }
 }

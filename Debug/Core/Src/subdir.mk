@@ -11,6 +11,8 @@ C_SRCS += \
 ../Core/Src/fsk_processing.c \
 ../Core/Src/linked_list.c \
 ../Core/Src/main.c \
+../Core/Src/math_util.c \
+../Core/Src/params.c \
 ../Core/Src/sampling_capture.c \
 ../Core/Src/stm32u5xx_hal_msp.c \
 ../Core/Src/stm32u5xx_hal_timebase_tim.c \
@@ -29,6 +31,8 @@ OBJS += \
 ./Core/Src/fsk_processing.o \
 ./Core/Src/linked_list.o \
 ./Core/Src/main.o \
+./Core/Src/math_util.o \
+./Core/Src/params.o \
 ./Core/Src/sampling_capture.o \
 ./Core/Src/stm32u5xx_hal_msp.o \
 ./Core/Src/stm32u5xx_hal_timebase_tim.o \
@@ -48,6 +52,8 @@ C_DEPS += \
 ./Core/Src/fsk_processing.d \
 ./Core/Src/linked_list.d \
 ./Core/Src/main.d \
+./Core/Src/math_util.d \
+./Core/Src/params.d \
 ./Core/Src/sampling_capture.d \
 ./Core/Src/stm32u5xx_hal_msp.d \
 ./Core/Src/stm32u5xx_hal_timebase_tim.d \
@@ -66,7 +72,7 @@ Core/Src/%.o: ../Core/Src/%.S Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/app_threadx.cyclo ./Core/Src/app_threadx.d ./Core/Src/app_threadx.o ./Core/Src/app_threadx.su ./Core/Src/events.cyclo ./Core/Src/events.d ./Core/Src/events.o ./Core/Src/events.su ./Core/Src/fsk_generator.cyclo ./Core/Src/fsk_generator.d ./Core/Src/fsk_generator.o ./Core/Src/fsk_generator.su ./Core/Src/fsk_processing.cyclo ./Core/Src/fsk_processing.d ./Core/Src/fsk_processing.o ./Core/Src/fsk_processing.su ./Core/Src/linked_list.cyclo ./Core/Src/linked_list.d ./Core/Src/linked_list.o ./Core/Src/linked_list.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/sampling_capture.cyclo ./Core/Src/sampling_capture.d ./Core/Src/sampling_capture.o ./Core/Src/sampling_capture.su ./Core/Src/stm32u5xx_hal_msp.cyclo ./Core/Src/stm32u5xx_hal_msp.d ./Core/Src/stm32u5xx_hal_msp.o ./Core/Src/stm32u5xx_hal_msp.su ./Core/Src/stm32u5xx_hal_timebase_tim.cyclo ./Core/Src/stm32u5xx_hal_timebase_tim.d ./Core/Src/stm32u5xx_hal_timebase_tim.o ./Core/Src/stm32u5xx_hal_timebase_tim.su ./Core/Src/stm32u5xx_it.cyclo ./Core/Src/stm32u5xx_it.d ./Core/Src/stm32u5xx_it.o ./Core/Src/stm32u5xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32u5xx.cyclo ./Core/Src/system_stm32u5xx.d ./Core/Src/system_stm32u5xx.o ./Core/Src/system_stm32u5xx.su ./Core/Src/tx_initialize_low_level.d ./Core/Src/tx_initialize_low_level.o
+	-$(RM) ./Core/Src/app_threadx.cyclo ./Core/Src/app_threadx.d ./Core/Src/app_threadx.o ./Core/Src/app_threadx.su ./Core/Src/events.cyclo ./Core/Src/events.d ./Core/Src/events.o ./Core/Src/events.su ./Core/Src/fsk_generator.cyclo ./Core/Src/fsk_generator.d ./Core/Src/fsk_generator.o ./Core/Src/fsk_generator.su ./Core/Src/fsk_processing.cyclo ./Core/Src/fsk_processing.d ./Core/Src/fsk_processing.o ./Core/Src/fsk_processing.su ./Core/Src/linked_list.cyclo ./Core/Src/linked_list.d ./Core/Src/linked_list.o ./Core/Src/linked_list.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/math_util.cyclo ./Core/Src/math_util.d ./Core/Src/math_util.o ./Core/Src/math_util.su ./Core/Src/params.cyclo ./Core/Src/params.d ./Core/Src/params.o ./Core/Src/params.su ./Core/Src/sampling_capture.cyclo ./Core/Src/sampling_capture.d ./Core/Src/sampling_capture.o ./Core/Src/sampling_capture.su ./Core/Src/stm32u5xx_hal_msp.cyclo ./Core/Src/stm32u5xx_hal_msp.d ./Core/Src/stm32u5xx_hal_msp.o ./Core/Src/stm32u5xx_hal_msp.su ./Core/Src/stm32u5xx_hal_timebase_tim.cyclo ./Core/Src/stm32u5xx_hal_timebase_tim.d ./Core/Src/stm32u5xx_hal_timebase_tim.o ./Core/Src/stm32u5xx_hal_timebase_tim.su ./Core/Src/stm32u5xx_it.cyclo ./Core/Src/stm32u5xx_it.d ./Core/Src/stm32u5xx_it.o ./Core/Src/stm32u5xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32u5xx.cyclo ./Core/Src/system_stm32u5xx.d ./Core/Src/system_stm32u5xx.o ./Core/Src/system_stm32u5xx.su ./Core/Src/tx_initialize_low_level.d ./Core/Src/tx_initialize_low_level.o
 
 .PHONY: clean-Core-2f-Src
 

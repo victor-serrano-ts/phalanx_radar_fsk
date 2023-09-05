@@ -32,30 +32,20 @@ uint32_t data_sin[32]  = {
 };*/
 
 
-void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma)
-{
-  /* Add code to be performed after DMA half complete */
-	asm("NOP");
-}
-
-void setConfigPll(pll_fsk_config_t *config)
+void set_config_pll(pll_fsk_config_t *config)
 {
 	//Send config to PLL over microWire protocol
 
 }
 
-void setPllState(pll_state_t state)
+void set_pll_state(pll_state_t state)
 {
 	// Send state to PLL over microWire protocol
 
 }
 
-/**
-  * @brief  Function implementing start FSK signal transmission.
-  * @param  None
-  * @retval None
-  */
-void startFskTransmission(void)
+
+void start_fsk_transmission(void)
 {
 	pll_fsk_config_t pll_config;
 
@@ -75,12 +65,7 @@ void startFskTransmission(void)
 	}
 }
 
-/**
-  * @brief  Function implementing stop FSK signal transmission.
-  * @param  None
-  * @retval None
-  */
-void stopFskTransmission(void)
+void stop_fsk_transmission(void)
 {
 	if (HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1) != HAL_OK)
 	{
@@ -95,5 +80,12 @@ void stopFskTransmission(void)
 //  {
 //	  Error_Handler();
 //  }
+}
+
+
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdma)
+{
+  /* Add code to be performed after DMA half complete */
+	asm("NOP");
 }
 
