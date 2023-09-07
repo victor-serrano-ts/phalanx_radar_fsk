@@ -31,7 +31,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "main.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -49,8 +48,8 @@
 #define THREAD_SAMPLING_CAPTURE_PRIO                          	10
 #define THREAD_SAMPLING_CAPTURE_PREEMPTION_THRESHOLD          	10
 
-#define THREAD_SIGNAL_PROCESSING_PRIO                          	10
-#define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	10
+#define THREAD_SIGNAL_PROCESSING_PRIO                          	10 //9
+#define THREAD_SIGNAL_PROCESSING_PREEMPTION_THRESHOLD          	10 //9
 
 #define THREAD_EVENT_DETECTOR_PRIO                          		10
 #define THREAD_EVENT_DETECTOR_PREEMPTION_THRESHOLD          		10

@@ -6,6 +6,7 @@
  */
 
 #include "fsk_generator.h"
+#include "main.h"
 #include <stdint.h>
 
 

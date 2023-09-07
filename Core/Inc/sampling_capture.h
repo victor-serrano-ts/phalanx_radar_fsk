@@ -10,6 +10,8 @@
 
 /*Includes*/
 #include "main.h"
+#include "arm_math.h"
+#include <stdbool.h>
 
 /* FSK Constants */
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  10240)   /* Size of array aADCxConvertedData[] */
@@ -23,6 +25,24 @@
 #define ADC_RX2_I_OFFSET 2
 #define ADC_RX2_Q_OFFSET 3
 #define ADC_FSK_OFFSET   4
+
+/* FSK Variables */
+extern uint32_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
+
+extern float32_t fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL];
+
+extern float32_t rx1_f1_cmplx[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx1_f2_cmplx[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx2_f1_cmplx[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+extern float32_t rx2_f2_cmplx[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
+
+extern bool first_half_data_ready;
+extern bool first_half_fft_done;
+extern bool second_half_data_ready;
+extern bool second_half_fft_done;
+extern uint32_t adc_full_count;
+extern uint32_t adc_half_count;
+
 
 /* FSK Functions */
 
@@ -58,28 +78,6 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc);
   */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
 
-/* FSK Variables */
-extern uint32_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
-extern float32_t fsk[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL];
-extern float32_t rx1[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float32_t rx2[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-
-extern float32_t rx1_f1_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float32_t rx1_f1_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float32_t rx1_f2_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float32_t rx1_f2_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float32_t rx2_f1_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-extern float32_t rx2_f1_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-//extern float32_t rx2_f2_i[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-//extern float32_t rx2_f2_q[ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2];
-
-
-extern bool first_half_data_ready;
-extern bool first_half_fft_done;
-extern bool second_half_data_ready;
-extern bool second_half_fft_done;
-extern uint32_t adc_full_count;
-extern uint32_t adc_half_count;
 
 /* FMCW Constants */
 /* FMCW Functions */

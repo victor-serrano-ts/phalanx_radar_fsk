@@ -6,6 +6,8 @@
  */
 
 #include "params.h"
+#include "arm_math.h"
+
 
 /** @brief Representation of the external parameters memory used to compute
  * offsets and sizes. */
@@ -47,8 +49,8 @@ typedef struct  __attribute__((__packed__))
 } param_data_t;
 
 /** External flash memeory address of the indicated parameter. */
-#define PARAM_ADDRESS(x)                (MEM_PARAM_ADDRESS + \
-                                         offsetof(param_data_t, x))
+//#define PARAM_ADDRESS(x)                (MEM_PARAM_ADDRESS + \
+//                                         offsetof(param_data_t, x))
 
 /** Given a main page parameter address, return its backup address. */
 #define PARAM_BK_ADDRESS(x)             (x + 0x1000)

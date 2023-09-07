@@ -32,9 +32,9 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "linked_list.h"
-#include "arm_math.h"
-#include <stdbool.h>
-#include <stdint.h>
+//#include "arm_math.h"
+//#include <stdbool.h>
+//#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

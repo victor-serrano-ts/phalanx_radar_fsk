@@ -8,7 +8,7 @@
 #ifndef EVENTS_H_
 #define EVENTS_H_
 
-#include "main.h"
+//#include "main.h"
 #include "fsk_processing.h"
 #include "params.h"
 

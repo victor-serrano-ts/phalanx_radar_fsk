@@ -9,13 +9,24 @@
 #define FSK_PROCESSING_H_
 
 /* Includes */
-#include "main.h"
+#include "arm_math.h"
 
 /* Constants */
 
 /** FFT length for Doppler mode. */
 #define FSK_LENGTH_SAMPLES 					2048
 #define FSK_FFT_SIZE 								1024
+
+/** FFT bins to frequency (Hz) Conversion:
+ * (sps / FFT_size) */
+/*
+#define DOPPLER_BIN_TO_HZ                   ((float)RAD_SAMPLING_FREQ / \
+                                             DOPPLER_FFT_SIZE)
+*/
+
+/** Frequency (Hz) to speed (km/h). Conversion:
+ * (c /(2 * f_tx) = 3e8 / (2 * 24.125e9) / 1000 * 3600) */
+#define FSK_HZ_TO_KMH                   (1.0f / 44.4f) // TODO - cambiar con frecuencia final de transmisión
 
 /* Types */
 
@@ -37,6 +48,9 @@ typedef enum {
   MOTION_DEPARTING,
   MOTION_APPROACHING,
 }fsk_motion_t;
+
+/* Variables */
+extern uint32_t total_ffts;
 
 /* Functions */
 
@@ -69,62 +83,9 @@ fsk_result_t get_detection_parameters(void);
  * @param signal_i Signal I to be processed.
  * @param signal_q Signal Q to be processed.
  */
-void fsk_process(fsk_result_t *result, const float32_t *signal_i, const float32_t *signal_q);
+void fsk_process(fsk_result_t *result, float32_t *signal_data);
 
-/**
-  * @brief  Function implementing get bin level detected
-  * @param  None
-  * @retval float32_t
-  */
-//float32_t getBinLevel(void);
 
-/**
-  * @brief  Function implementing get frequency detected
-  * @param  None
-  * @retval float32_t
-  */
-float32_t get_frequency(float32_t *rx_data_samples);
 
-/**
-  * @brief  Function implementing get angle detected
-  * @param  None
-  * @retval float32_t
-  */
-//float32_t getAngle(void);
-/**
-  * @brief  Function implementing get speed detected
-  * @param  None
-  * @retval float32_t
-  */
-//float32_t getSpeed(void);
-/**
-  * @brief  Function implementing get distance detected (cm or m?)
-  * @param  None
-  * @retval float32_t
-  */
-//float32_t getDistance(void);
-/**
-  * @brief  Function implementing get motion detected
-  * @param  None
-  * @retval uint32_t
-  */
-//uint32_t 	getMotion(void);
-/**
-  * @brief  Function implementing get noise detected
-  * @param  None
-  * @retval float32_t
-  */
-//float32_t getNoise(void);
-/**
-  * @brief  Function implementing get acceleration value
-  * @param  None
-  * @retval int32_t
-  */
-//int32_t 	getAccMax(void);
-
-/* Variables */
-extern uint32_t rx1_freq;
-extern uint32_t rx2_freq;
-extern uint32_t total_ffts;
 
 #endif /* FSK_PROCESSING_H_ */

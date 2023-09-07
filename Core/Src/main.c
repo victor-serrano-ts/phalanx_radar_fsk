@@ -57,6 +57,8 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+extern DMA_QListTypeDef ADCQueue;
+extern DMA_QListTypeDef DACQueue;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

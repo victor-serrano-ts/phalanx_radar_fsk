@@ -8,7 +8,8 @@
 #ifndef PARAMS_H_
 #define PARAMS_H_
 
-#include "main.h"
+#include <stdbool.h>
+#include "arm_math.h"
 
 /**
  * @defgroup Parameter_initial_value
@@ -47,46 +48,46 @@
 /** @brief Struct including the general parameters */
 typedef struct __attribute__((__packed__))
 {
-    float bin_slow_thr;
-    float bin_reverse_thr;
-    float bin_stop_thr;
-    float bin_fast_thr;
-    float speed_min;
-    float speed_max;
-    int16_t acc_thr;
-    int16_t count_slow_thr;
-    int16_t count_reverse_thr;
-    int16_t count_stop_thr;
-    int16_t count_fast_thr;
+	float32_t bin_slow_thr;
+	float32_t bin_reverse_thr;
+	float32_t bin_stop_thr;
+	float32_t bin_fast_thr;
+	float32_t speed_min;
+	float32_t speed_max;
+	int16_t acc_thr;
+	int16_t count_slow_thr;
+	int16_t count_reverse_thr;
+	int16_t count_stop_thr;
+	int16_t count_fast_thr;
 } param_general_t;
 
 /** @brief Struct including the CFAR specific parameters */
 typedef struct __attribute__((__packed__))
 {
-    float cfar_slow_thr;
-    float cfar_reverse_thr;
-    float cfar_stop_thr;
-    float cfar_fast_thr;
+	float32_t cfar_slow_thr;
+	float32_t cfar_reverse_thr;
+	float32_t cfar_stop_thr;
+  float32_t cfar_fast_thr;
 } param_cfar_t;
 
 /** @brief Struct including the extended parameters */
 typedef struct __attribute__((__packed__))
 {
-    int16_t moving_avg_len;
-    float reverse_dynamic_low_th;
-    float reverse_dynamic_high_th;
-    int16_t reverse_dynamic_min_val;
-    float high_speeding_th;
-    int16_t count_fast_filter_thr;
+	int16_t moving_avg_len;
+	float32_t reverse_dynamic_low_th;
+	float32_t reverse_dynamic_high_th;
+	int16_t reverse_dynamic_min_val;
+	float32_t high_speeding_th;
+	int16_t count_fast_filter_thr;
 } param_ext_t;
 
 /** @brief Struct including the power saving parameters */
 typedef struct __attribute__((__packed__))
 {
-    uint8_t num_slots;
-    uint8_t slot_assigned;
-    uint16_t cycle_duration;
-    uint8_t min_battery_thr;
+	uint8_t num_slots;
+	uint8_t slot_assigned;
+	uint16_t cycle_duration;
+	uint8_t min_battery_thr;
 } param_power_t;
 
 /**

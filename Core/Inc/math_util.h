@@ -8,7 +8,7 @@
 #ifndef MATH_UTIL_H_
 #define MATH_UTIL_H_
 
-#include "main.h"
+#include "arm_math.h"
 
 /**
  * @brief Compute the moving average.
@@ -20,6 +20,6 @@
  *
  * @return Moving average
  */
-float moving_average(float value, int* index, float* buffer, uint32_t size);
+float32_t moving_average(float32_t value, int* index, float32_t* buffer, uint32_t size);
 
 #endif /* MATH_UTIL_H_ */

@@ -10,7 +10,6 @@
 
 /* Includes */
 #include "stm32u5xx_hal.h"
-#include "main.h"
 
 /* Constants */
 

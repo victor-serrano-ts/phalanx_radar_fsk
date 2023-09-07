@@ -224,7 +224,7 @@ void MainThread_entry(ULONG thread_input)
 		adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
 		ffts_per_second = total_ffts / adc_total_time_seconds;
-		printf("ADC channel rate: %lu, FFTs rate: %lu, RX1 freq: %lu, RX2 freq: %lu\r\n", adc_channel_rate_ksps, ffts_per_second, rx1_freq, rx2_freq);
+		printf("ADC channel rate: %lu, FFTs rate: %lu\r\n", adc_channel_rate_ksps, ffts_per_second);
 		printf("Signal: %lu, Sampling: %lu, Processsing: %lu, Detector: %lu\r\n", counter_signal, counter_sampling, counter_processing, counter_detector);
 		//printf("adc_half_count: %lu, adc_full_count: %lu\r\n",adc_half_count, adc_full_count);
 		counter_signal = 0;
