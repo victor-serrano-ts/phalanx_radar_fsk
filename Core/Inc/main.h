@@ -60,7 +60,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define SAMPLE_FREQ 100000
+#define SAMPLE_FREQ 50000
 
 /* USER CODE BEGIN Private defines */
 extern ADC_HandleTypeDef hadc1;

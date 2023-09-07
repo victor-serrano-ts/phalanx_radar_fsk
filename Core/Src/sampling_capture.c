@@ -50,11 +50,16 @@ void fill_and_interpolate_fsk_rx_buffers(void)
 	uint16_t last_f2_index = 0;
 	uint32_t step_offset = first_half_data_ready ? 0 : ADC_CONVERTED_DATA_BUFFER_STEP_OFFSET;
 
+	// Clean RX buffers before filling them again.
+	memset(rx1_f1_cmplx, 0, sizeof(rx1_f1_cmplx));
+	memset(rx1_f2_cmplx, 0, sizeof(rx1_f2_cmplx));
+	memset(rx2_f1_cmplx, 0, sizeof(rx2_f1_cmplx));
+	memset(rx2_f2_cmplx, 0, sizeof(rx2_f2_cmplx));
 
 	if ( (first_half_data_ready && !first_half_fft_done) || (second_half_data_ready && !second_half_fft_done) ) {
 		for (int i = 0; i < ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL; i++) {
 
-			fsk[i] = (float) aADCxConvertedData[ADC_FSK_OFFSET + i * ADC_ENABLED_CHANNEL_COUNT + step_offset];
+			fsk[i] = (float32_t) aADCxConvertedData[ADC_FSK_OFFSET + i * ADC_ENABLED_CHANNEL_COUNT + step_offset];
 
 			if (fsk[i] < FSK_THRESHOLD && f1_index < (ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL*2)) {
 				rx1_f1_cmplx[2 * i] = (float32_t) aADCxConvertedData[ADC_RX1_I_OFFSET + i * ADC_ENABLED_CHANNEL_COUNT + step_offset];

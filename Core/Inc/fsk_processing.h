@@ -67,6 +67,7 @@ void init_fft_module(void);
   */
 fsk_result_t get_detection_parameters(void);
 
+//TODO - cambiar este comentario con la implementación final
 /**
  * @brief Process I and Q signals to obtaining the speed and direction of a
  * detected object. Steps done:
@@ -83,7 +84,7 @@ fsk_result_t get_detection_parameters(void);
  * @param signal_i Signal I to be processed.
  * @param signal_q Signal Q to be processed.
  */
-void fsk_process(fsk_result_t *result, float32_t *signal_data);
+void fsk_process(fsk_result_t *result, float32_t *rx1_f1, float32_t *rx1_f2, float32_t *rx2_f1);
 
 
 

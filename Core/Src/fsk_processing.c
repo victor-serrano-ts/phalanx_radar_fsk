@@ -26,38 +26,84 @@ void init_fft_module(void)
 
 fsk_result_t get_detection_parameters(void)
 {
-	fsk_result_t detection_results;
+	fsk_result_t detection_results = {0};
 
-	fsk_process(&detection_results, &rx1_f1_cmplx[0]);
+	/* frequency, bin level, angle and distance calculation */
+	fsk_process(&detection_results,
+							&rx1_f1_cmplx[0],
+							&rx1_f2_cmplx[0],
+							&rx2_f1_cmplx[0]);
+
+	/* motion calculation and frequency correction*/
+	if(detection_results.frequency_hz <= (FSK_FFT_SIZE / 2)) {
+		detection_results.motion = MOTION_DEPARTING;
+	} else {
+		detection_results.motion = MOTION_APPROACHING;
+		detection_results.frequency_hz = FSK_FFT_SIZE - detection_results.frequency_hz;
+	}
+
+	/* speed calculation */
+	detection_results.speed_kmh = detection_results.frequency_hz * FSK_HZ_TO_KMH; // TODO - comprobar fórmula y adapatar
+
+	/* noise level calculation */
+	//result->noise_level = ;  // // TODO - implementar CFAR y hacer lo de RIDE
+
+
 
 	return detection_results;
 }
 
-void fsk_process(fsk_result_t *result, float32_t *signal_data)
+void fsk_process(fsk_result_t *result, float32_t *rx1_f1, float32_t *rx1_f2, float32_t *rx2_f1)
 {
-	float32_t max_bin = 0.0;
-	uint32_t maxIndex = 0;
+	float32_t rx1f1_max_bin = 0.0;
+	float32_t rx1f2_max_bin = 0.0;
+	float32_t rx2f1_max_bin = 0.0;
+	uint32_t rx1f1_maxIndex = 0;
+	uint32_t rx1f2_maxIndex = 0;
+	uint32_t rx2f1_maxIndex = 0;
+	float32_t rx1f1_phase = 0.0;
+	float32_t rx1f2_phase = 0.0;
+	float32_t rx2f1_phase = 0.0;
+	uint32_t rx1f1_freq = 0;
+	uint32_t rx1f2_freq = 0;
+	uint32_t rx2f1_freq = 0;
 
-	//float32_t snr1 = 0.0;
-
-	arm_cfft_f32(&varInstCfftF32, signal_data, ifftFlag, doBitReverse);
-	arm_cmplx_mag_squared_f32(signal_data, testOutput, FSK_FFT_SIZE);
+	/* rx1_f1 signal processing */
+	arm_cfft_f32(&varInstCfftF32, rx1_f1, ifftFlag, doBitReverse);
+	arm_cmplx_mag_squared_f32(rx1_f1, testOutput, FSK_FFT_SIZE);
 	testOutput[0] = 0;
-	arm_max_f32(testOutput, FSK_FFT_SIZE, &max_bin, &maxIndex);
+	arm_max_f32(testOutput, FSK_FFT_SIZE, &rx1f1_max_bin, &rx1f1_maxIndex);
+	rx1f1_freq = SAMPLE_FREQ * rx1f1_maxIndex / FSK_FFT_SIZE;
+	rx1f1_phase = atan2(rx1_f1[rx1f1_maxIndex*2+1], rx1_f1[rx1f1_maxIndex*2]);
+	total_ffts++;
 
-	result->frequency_hz = SAMPLE_FREQ * maxIndex / FSK_FFT_SIZE;
+	/* rx2_f1 signal processing */
+	arm_cfft_f32(&varInstCfftF32, rx2_f1, ifftFlag, doBitReverse);
+	arm_cmplx_mag_squared_f32(rx2_f1, testOutput, FSK_FFT_SIZE);
+	testOutput[0] = 0;
+	arm_max_f32(testOutput, FSK_FFT_SIZE, &rx2f1_max_bin, &rx2f1_maxIndex);
+	rx2f1_freq = SAMPLE_FREQ * rx2f1_maxIndex / FSK_FFT_SIZE;
+	rx2f1_phase = atan2(rx2_f1[rx2f1_maxIndex*2+1], rx2_f1[rx2f1_maxIndex*2]);
+	total_ffts++;
 
-	result->bin_level = max_bin;
+	/* rx1_f2 signal processing */
+	arm_cfft_f32(&varInstCfftF32, rx1_f2, ifftFlag, doBitReverse);
+	arm_cmplx_mag_squared_f32(rx1_f2, testOutput, FSK_FFT_SIZE);
+	testOutput[0] = 0;
+	arm_max_f32(testOutput, FSK_FFT_SIZE, &rx2f1_max_bin, &rx1f2_maxIndex);
+	rx1f2_freq = SAMPLE_FREQ * rx1f2_maxIndex / FSK_FFT_SIZE;
+	rx1f2_phase = atan2(rx1_f2[rx1f2_maxIndex*2+1], rx1_f2[rx1f2_maxIndex*2]);
+	total_ffts++;
 
-	if(result->bin_level < (FSK_FFT_SIZE / 2)) {
-		result->motion = MOTION_DEPARTING;
-	} else {
-		result->motion = MOTION_APPROACHING;
-		result->bin_level -= FSK_FFT_SIZE;
-	}
+	/* bin level calculation */
+	result->bin_level = rx1f1_max_bin;
 
-	//result->angle = ; // TODO - Con el desfase de f1 de Rx1 y Rx2 se calcula el ángulo
-	//result->distance = ; //// TODO - Con la diferencia de fase de f1 y f2 de Rx1
-	result->speed_kmh = result->frequency_hz * FSK_HZ_TO_KMH;
-	//result->noise_level = ;  // // TODO - No encuentro función del CMSIS que lo haga directo
+	/* frequency calculation */
+	result->frequency_hz = SAMPLE_FREQ * rx1f1_maxIndex / FSK_FFT_SIZE;
+
+	/* Angle calculation */
+	result->angle = rx1f1_phase - rx2f1_phase; // TODO - Con el fase de f1 de Rx1 y Rx2 se calcula el ángulo y la distancia entre antenas
+
+	/* distance calculation */
+	//result->distance = ; // TODO - Con la diferencia de fase de f1 y f2 de Rx1, diferencia de frecuencias y la velocidad de la luz
 }
