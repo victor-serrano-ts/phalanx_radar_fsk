@@ -7,6 +7,9 @@
 
 #include "sampling_capture.h"
 #include "app_threadx.h"
+#ifdef DEBUG_RX_SIGNALS
+	#include "rx_signals_test.h"
+#endif
 
 uint32_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE] = {0};
 
@@ -23,6 +26,8 @@ bool second_half_data_ready = false;
 bool second_half_fft_done = false;
 uint32_t adc_full_count = 0;
 uint32_t adc_half_count = 0;
+
+uint32_t adc_callbacks_count = 0;
 
 
 void start_fsk_sampling_capture(void)
@@ -124,12 +129,34 @@ void fill_and_interpolate_fsk_rx_buffers(void)
 	//		//interpolation_instance.pYData =
 	//	}
 
+	//arm_spline_instance_f32 interpolation_instance = ();
+
+}
+
+void fill_rx_buffers_test (void)
+{
+	int j = 0;
+
+	for (int i = 0; i < ADC_CONVERTED_DATA_BUFFER_SIZE_PER_CHANNEL; i++) {
+		// Rx1_f1
+		rx1_f1_cmplx[j] = rx1f1_i[i];
+		rx1_f1_cmplx[j+1] = rx1f1_q[i];
+		// Rx1_f2
+		rx1_f2_cmplx[j] = rx1f2_i[i];
+		rx1_f2_cmplx[j+1] = rx1f2_q[i];
+		// Rx2_f1
+		rx2_f1_cmplx[j] = rx2f1_i[i];
+		rx2_f1_cmplx[j+1] = rx2f1_q[i];
+
+		j+=2;
+	}
 }
 
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
 {
   /* Add code to be performed after DMA half complete */
   adc_half_count++;
+  adc_callbacks_count++;
   first_half_data_ready = true;
   first_half_fft_done = false;
   second_half_data_ready = false;
@@ -144,6 +171,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
   /* Add code to be performed after DMA full complete */
 	adc_full_count++;
+	adc_callbacks_count++;
 	first_half_data_ready = false;
 	first_half_fft_done = false;
 	second_half_data_ready = true;

@@ -211,10 +211,11 @@ CHAR *pointer;
 void MainThread_entry(ULONG thread_input)
 {
   /* USER CODE BEGIN MainThread_entry */
-/*	startFskTransmission();
-	startFskSamplingCapture();
-	initFftModule();
-*/
+
+//	startFskTransmission();
+//	startFskSamplingCapture();
+//	initFftModule();
+
 
 	/* Infinite loop */
 	while(1)
@@ -224,10 +225,15 @@ void MainThread_entry(ULONG thread_input)
 		adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
 		ffts_per_second = total_ffts / adc_total_time_seconds;
-		printf("ADC channel rate: %lu, FFTs rate: %lu\r\n", adc_channel_rate_ksps, ffts_per_second);
-		printf("Signal: %lu, Sampling: %lu, Processsing: %lu, Detector: %lu\r\n", counter_signal, counter_sampling, counter_processing, counter_detector);
-		//printf("adc_half_count: %lu, adc_full_count: %lu\r\n",adc_half_count, adc_full_count);
+//		printf(%c[2J"ADC channel rate: %lu, FFTs rate: %lu\r\n*/"rx1f1(freq|phase): (%lu|%f) rx1f2(freq|phase): (%lu|%f) rx2f1(freq|phase): (%lu|%f)\r\n 0x1b",
+//				//adc_channel_rate_ksps, ffts_per_second,
+//				rx1f1_freq, rx1f1_phase,
+//				rx1f2_freq, rx1f2_phase,
+//				rx2f1_freq, rx2f1_phase);
+//		printf("Signal: %lu, Callbacks: %lu, Sampling: %lu, Processsing: %lu, Detector: %lu\r\n", counter_signal, adc_callbacks_count, counter_sampling, counter_processing, counter_detector);
+//		printf("adc_half_count: %lu, adc_full_count: %lu\r\n",adc_half_count, adc_full_count);
 		counter_signal = 0;
+		adc_callbacks_count = 0;
 		counter_sampling = 0;
 		counter_processing = 0;
 		counter_detector = 0;
@@ -310,11 +316,14 @@ void ThreadSamplingCapture_Entry(ULONG thread_input)
 	  }
 	  else
 	  {
-	  	//TODO - Sampling Capture actions
 	  	//printf("Sampling capture thread execution!\r\n");
 	  	counter_sampling++;
 
+#ifndef DEBUG_RX_SIGNALS
 	  	fill_and_interpolate_fsk_rx_buffers();
+#else
+	  	fill_rx_buffers_test();
+#endif
 	    if (tx_event_flags_set(&EventFlag, THREAD_SIGNAL_PROCESSING_EVT, TX_OR) != TX_SUCCESS)
 	  	{
 	  		Error_Handler();
@@ -346,7 +355,6 @@ void ThreadSignalProcessing_Entry(ULONG thread_input)
 	  }
 	  else
 	  {
-	  	// TODO - Processing signal actions
 	  	//printf("Processing signal thread execution!\r\n");
 	  	counter_processing++;
 	  	detection_result_snd = get_detection_parameters();
@@ -374,6 +382,9 @@ void ThreadEventDetector_Entry(ULONG thread_input)
 {
 	fsk_result_t detection_result_rcv;
 	UINT status = 0;
+	uint32_t counter = 0;
+
+
 
 	set_default_params();
 
@@ -382,19 +393,21 @@ void ThreadEventDetector_Entry(ULONG thread_input)
   /* Infinite loop */
   while(1)
   {
+  	counter++;
   	counter_detector++;
     status = tx_queue_receive(&tx_app_msg_queue, &detection_result_rcv, TX_WAIT_FOREVER/*TX_NO_WAIT*/);
     if ( status == TX_SUCCESS)
     {
-//    	printf("bin: %f, freq: %f, angel: %f, speed: %f, distance: %f, motion: %lu, noise: %f\r\n",
-//    			detection_result_rcv.bin_level,
-//					detection_result_rcv.frequency_hz,
-//					detection_result_rcv.angle,
-//					detection_result_rcv.speed_kmh,
-//					detection_result_rcv.distance,
-//					detection_result_rcv.motion,
-//					detection_result_rcv.noise_level);
-    	//printf("Mssg_Rcv!!\r\n");
+    	if(counter % 10 == 0) {
+				printf("%c[2Jbin: %f\r\nfreq: %f\r\nangle: %f\r\nspeed: %f\r\ndistance: %f\r\nmotion: %lu\r\nnoise: %f\r\n",0x1b,
+						detection_result_rcv.bin_level,
+						detection_result_rcv.frequency_hz,
+						detection_result_rcv.angle,
+						detection_result_rcv.speed_kmh,
+						detection_result_rcv.distance,
+						detection_result_rcv.motion,
+						detection_result_rcv.noise_level);
+    	}
 
     	switch(fsk_radar_st)
     	{
@@ -419,7 +432,7 @@ void ThreadEventDetector_Entry(ULONG thread_input)
 					fsk_event_result = wait_for_more_events(&detection_result_rcv, 100);
 
 					if((fsk_event_result != EVENT_NONE) && (fsk_event_result != EVENT_FAST)) {
-						printf("event %d detected!\r\n", fsk_event_result);
+						//printf("event %d detected!\r\n", fsk_event_result);
 					}
 					else
 					{

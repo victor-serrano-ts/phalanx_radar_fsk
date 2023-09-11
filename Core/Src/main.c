@@ -689,6 +689,10 @@ static void MX_TIM1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM1_Init 2 */
+//  if(HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1 != HAL_OK))
+//  {
+//	  Error_Handler();
+//  }
   if (HAL_TIM_Base_Start(&htim1) != HAL_OK)
   {
     Error_Handler();

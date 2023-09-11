@@ -43,6 +43,7 @@ extern bool second_half_fft_done;
 extern uint32_t adc_full_count;
 extern uint32_t adc_half_count;
 
+extern uint32_t adc_callbacks_count;
 
 /* FSK Functions */
 
@@ -64,6 +65,10 @@ void stop_fsk_sampling_capture(void);
   * @retval None
   */
 void fill_and_interpolate_fsk_rx_buffers(void);
+
+#ifdef DEBUG_RX_SIGNALS
+	void fill_rx_buffers_test(void);
+#endif
 
 /**
   * @brief  Conversion complete callback in non-blocking mode

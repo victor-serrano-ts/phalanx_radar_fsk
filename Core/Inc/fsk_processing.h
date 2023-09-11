@@ -14,19 +14,20 @@
 /* Constants */
 
 /** FFT length for Doppler mode. */
-#define FSK_LENGTH_SAMPLES 					2048
-#define FSK_FFT_SIZE 								1024
+#define FSK_LENGTH_SAMPLES 								2048
+#define FSK_FFT_SIZE 											1024
 
-/** FFT bins to frequency (Hz) Conversion:
- * (sps / FFT_size) */
-/*
-#define DOPPLER_BIN_TO_HZ                   ((float)RAD_SAMPLING_FREQ / \
-                                             DOPPLER_FFT_SIZE)
-*/
+#define BSP_TGT_WAVE_LENGTH_MM						(12.4f)
+#define BSP_TGT_ANTENNA_SPACING_MM				(6.22f)
+#define WAVE_LENGHT_ANT_SPACING_RATIO			(BSP_TGT_WAVE_LENGTH_MM / BSP_TGT_ANTENNA_SPACING_MM)
+
+#define LIGHT_VELOCITY										(300000000.0f)
+#define FREQUENCY_DIFF										(2000000.0f)
+
 
 /** Frequency (Hz) to speed (km/h). Conversion:
  * (c /(2 * f_tx) = 3e8 / (2 * 24.125e9) / 1000 * 3600) */
-#define FSK_HZ_TO_KMH                   (1.0f / 44.4f) // TODO - cambiar con frecuencia final de transmisión
+#define FSK_HZ_TO_KMH                   	(1.0f / 44.4f)
 
 /* Types */
 
@@ -36,7 +37,7 @@ typedef struct __attribute__((__packed__)) {
 	float32_t frequency_hz;				// FSK frequency (Hz)
 	float32_t angle;							// FSK angle of target
 	float32_t speed_kmh;					// speed of target
-	float32_t distance;						// distance of target (TODO cm/m?)
+	float32_t distance;						// distance of target (m)
 	uint32_t motion;							// FSK detetcted direction
 	float32_t noise_level;							// Estimated noise level
 } fsk_result_t;
@@ -51,6 +52,7 @@ typedef enum {
 
 /* Variables */
 extern uint32_t total_ffts;
+
 
 /* Functions */
 
@@ -67,7 +69,7 @@ void init_fft_module(void);
   */
 fsk_result_t get_detection_parameters(void);
 
-//TODO - cambiar este comentario con la implementación final
+//TODO - Change this comment with final implementation
 /**
  * @brief Process I and Q signals to obtaining the speed and direction of a
  * detected object. Steps done:
@@ -85,8 +87,6 @@ fsk_result_t get_detection_parameters(void);
  * @param signal_q Signal Q to be processed.
  */
 void fsk_process(fsk_result_t *result, float32_t *rx1_f1, float32_t *rx1_f2, float32_t *rx2_f1);
-
-
 
 
 #endif /* FSK_PROCESSING_H_ */
