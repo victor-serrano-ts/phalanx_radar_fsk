@@ -24,6 +24,13 @@
 #define LIGHT_VELOCITY										(300000000.0f)
 #define FREQUENCY_DIFF										(2000000.0f)
 
+/** Number of active cells to use on each side of the target bin to estimate the
+ * noise. */
+#define DOPPLER_NOISE_ACTIVE_CELLS				(20)
+
+/** Number of guard cells to use on each side of the target bin to estimate the
+ * noise. */
+#define DOPPLER_NOISE_GUARD_CELLS         (5)
 
 /** Frequency (Hz) to speed (km/h). Conversion:
  * (c /(2 * f_tx) = 3e8 / (2 * 24.125e9) / 1000 * 3600) */
@@ -88,5 +95,7 @@ fsk_result_t get_detection_parameters(void);
  */
 void fsk_process(fsk_result_t *result, float32_t *rx1_f1, float32_t *rx1_f2, float32_t *rx2_f1);
 
+
+void fft_estimate_noise(float32_t *complex_data_buf, float32_t *noise_level, uint32_t target_bin);
 
 #endif /* FSK_PROCESSING_H_ */

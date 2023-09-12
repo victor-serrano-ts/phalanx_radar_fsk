@@ -225,7 +225,7 @@ void MainThread_entry(ULONG thread_input)
 		adc_total_rate_ksps = adc_full_count * ADC_CONVERTED_DATA_BUFFER_SIZE / (adc_total_time_seconds);
 		adc_channel_rate_ksps = adc_total_rate_ksps / 5;
 		ffts_per_second = total_ffts / adc_total_time_seconds;
-//		printf(%c[2J"ADC channel rate: %lu, FFTs rate: %lu\r\n*/"rx1f1(freq|phase): (%lu|%f) rx1f2(freq|phase): (%lu|%f) rx2f1(freq|phase): (%lu|%f)\r\n 0x1b",
+//		printf(%c[2J"rx1f1(freq|phase): (%lu|%f) rx1f2(freq|phase): (%lu|%f) rx2f1(freq|phase): (%lu|%f)\r\n 0x1b",
 //				//adc_channel_rate_ksps, ffts_per_second,
 //				rx1f1_freq, rx1f1_phase,
 //				rx1f2_freq, rx1f2_phase,
@@ -237,9 +237,6 @@ void MainThread_entry(ULONG thread_input)
 		counter_sampling = 0;
 		counter_processing = 0;
 		counter_detector = 0;
-
-		//adc_half_count = 0;
-		//adc_full_count = 0;
 	}
   /* USER CODE END MainThread_entry */
 }
